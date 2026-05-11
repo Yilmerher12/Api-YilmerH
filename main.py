@@ -1,19 +1,19 @@
-# main.py
+#1. Importar fast api
 from fastapi import FastAPI
+from api.v1.api import api_router 
 
-# Crear la instancia de la aplicación
-app = FastAPI(
-    title="Mi Primera API por Yilmer Hernandez",
-    description="API proyecto VerdeApp para SENA ",
+#2. Crear instancia de fastapi
+app =FastAPI(
+    title="Mi primera API FAST API",
+    description="Primera API con fast API por Yilmer Hernandez Camargo",
     version="1.0.0",
+    
 )
 
-@app.post("/saludo")
-async def create_greeting(greeting: str):
-    """Endpoint para crear un nuevo saludo."""
-    if (greeting == "Yilmer"):
-        return {"message": "Bienvenido a la app, Admin: "f"¡{greeting}!"}
-    elif (greeting != "Yilmer" and greeting != ""):
-        return {"message": "Bienvenido a la app, Usuario: "f"¡{greeting}!"}
-    else:
-        return {"message": "Lo siento, no tienes acceso a la app, Usuario: "f"¡{greeting}!"}
+# Conexión de todas las rutas bajo el prefijo /api/v1
+app.include_router(api_router, prefix="/api/v1")
+
+#3. Definir un endpoint en la ruta raiz
+@app.get("/")
+async def root():
+    return {"message": "Hola jejej desde FastAPI!"}
