@@ -1,19 +1,22 @@
-#1. Importar fast api
+# vamos al entorno virtual, a la libreria fastapi y extraiga la clase principal FastAPI 
 from fastapi import FastAPI
-from api.v1.api import api_router 
+# Importamos el unificador maestro
+from api.v1.api import api_router
 
-#2. Crear instancia de fastapi
-app =FastAPI(
-    title="Mi primera API FAST API",
-    description="Primera API con fast API por Yilmer Hernandez Camargo",
-    version="1.0.0",
-    
-)
+#vEsta variable 'app' es la aplicación central que gestionará todas las rutas y configuraciones de tu API.
+app = FastAPI()
 
-# Conexión de todas las rutas bajo el prefijo /api/v1
-app.include_router(api_router, prefix="/api/v1")
+# Fusionamos el unificador maestro a la memoria central de la aplicación
+app.include_router(api_router)
 
-#3. Definir un endpoint en la ruta raiz
+
+# Decorador de operación de ruta.
+# Le indica a la aplicación ('app') que cuando reciba una petición HTTP de tipo GET en la ruta inicial ("/"), debe ejecutar específicamente la función que se define justo debajo.
 @app.get("/")
+
+
+#'async' define que esta es una función asincrónica. Esto significa que si la función necesita esperar un proceso (como consultar una base de datos), el servidor no se detiene; cede el control para atender otras peticiones al mismo tiempo.
 async def root():
-    return {"message": "Hola jejej desde FastAPI!"}
+# Retorna un diccionario estándar de Python.
+# FastAPI se encarga automáticamente de tomar este diccionario y convertirlo (serializarlo) a formato JSON para que el sistema que hizo la petición pueda entender la respuesta.
+    return {"mensaje": "Hola FastAPI"}

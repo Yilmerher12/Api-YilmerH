@@ -19,6 +19,21 @@ Actualmente, el proyecto mantiene una estructura inicial simplificada para facil
 Utilizar estos comandos en la terminal para gestionar el proyecto. 
 **Nota:** Se utiliza el prefijo ``python -m`` para garantizar que se use la versión correcta de Python en el sistema.
 
+```bash
+mi_proyecto/
+│
+├── venv/                           # Carpeta del entorno virtual (aislamiento)
+├── .env                            # Archivo de texto para variables y contraseñas
+├── requirements.txt                # Lista de dependencias del proyecto
+├── main.py                         # Punto de entrada (inicializa FastAPI y Uvicorn)
+│
+└── api/                            # Carpeta contenedora de la API
+    └── v1/                         # Versión 1 de tu API
+        ├── api.py                  # El UNIFICADOR central de todos los routers
+        └── endpoints/              # Carpeta exclusiva para los controladores de rutas
+            ├── usuarios.py         # Router específico para el recurso usuarios
+            └── productos.py        # Router específico para el recurso productos
+```
 
 1. `Preparación del Entorno:`
 
@@ -106,3 +121,8 @@ Una de las mayores ventajas de FastAPI es que genera la documentación técnica 
 Aquí puedes probar tus endpoints (como el de /saludo) directamente desde el navegador sin necesidad de usar herramientas externas.
 
 * **Redoc:** http://127.0.0.1:8000/redoc
+
+
+
+## PYdantic 
+Es una libreria que se instala automaticamentecon FastAPI. Su funcion es la validacion de tipo de dats. La clase BaseModel es la herramienta principal para definir, validar y serializar estructura de datos en python.Muchas lineas de codigo para inspeccionar textos JSON y validar tipo de datos.
