@@ -1,22 +1,37 @@
-# vamos al entorno virtual, a la libreria fastapi y extraiga la clase principal FastAPI 
+# Importo FastAPI para poder crear mi aplicación web
 from fastapi import FastAPI
-# Importamos el unificador maestro
-from api.v1.api import api_router
 
-#vEsta variable 'app' es la aplicación central que gestionará todas las rutas y configuraciones de tu API.
-app = FastAPI()
+# Importo el archivo de endpoints de usuarios
+from api.endpoints import usuarios
 
-# Fusionamos el unificador maestro a la memoria central de la aplicación
-app.include_router(api_router)
+# Importo el archivo de endpoints de productos
+from api.endpoints import productos
 
 
-# Decorador de operación de ruta.
-# Le indica a la aplicación ('app') que cuando reciba una petición HTTP de tipo GET en la ruta inicial ("/"), debe ejecutar específicamente la función que se define justo debajo.
+# Creo mi aplicación principal y le doy un título
+app = FastAPI(title="VerdeApp API")
+
+
+# Agrego las rutas relacionadas con usuarios
+app.include_router(
+    usuarios.router,                 # Uso el router que está en el archivo de usuarios
+    prefix="/api/usuarios",          # Defino el prefijo que tendrán las rutas de usuarios
+    tags=["Usuarios"]                # Coloco una etiqueta para organizar la documentación
+)
+
+# Agrego las rutas relacionadas con productos
+app.include_router(
+    productos.router,                # Uso el router que está en el archivo de productos
+    prefix="/api/productos",         # Defino el prefijo que tendrán las rutas de productos
+    tags=["Productos"]               # Coloco una etiqueta para organizar la documentación
+)
+
+
+# Creo una ruta principal para comprobar si el servidor funciona
 @app.get("/")
 
+# Defino una función asíncrona que se ejecuta cuando entro a la ruta "/"
+async def estado_servidor():
 
-#'async' define que esta es una función asincrónica. Esto significa que si la función necesita esperar un proceso (como consultar una base de datos), el servidor no se detiene; cede el control para atender otras peticiones al mismo tiempo.
-async def root():
-# Retorna un diccionario estándar de Python.
-# FastAPI se encarga automáticamente de tomar este diccionario y convertirlo (serializarlo) a formato JSON para que el sistema que hizo la petición pueda entender la respuesta.
-    return {"mensaje": "Hola FastAPI"}
+    # Retorno un mensaje indicando que el servidor está funcionando
+    return {"mensaje": "El servidor de VerdeApp está en línea y funcionando"}
