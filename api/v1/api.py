@@ -1,9 +1,27 @@
+# Importo APIRouter para organizar las rutas de la API
 from fastapi import APIRouter
-# Importamos el archivo de usuarios que acabamos de crear
+
+# Importo las rutas de usuarios
 from api.v1.endpoints import usuarios
 
-# Creamos el enrutador maestro
+# Importo las rutas de productos
+from api.v1.endpoints import productos
+
+
+# Creo un router principal para agrupar las rutas
 api_router = APIRouter()
 
-# Fusionamos las rutas de usuarios dentro del maestro
-api_router.include_router(usuarios.router, prefix="/usuarios")
+
+# Agrego las rutas relacionadas con usuarios
+api_router.include_router(
+    usuarios.router,
+    prefix="/usuarios",
+    tags=["Usuarios"]
+)
+
+# Agrego las rutas relacionadas con productos
+api_router.include_router(
+    productos.router,
+    prefix="/productos",
+    tags=["Productos"]
+)
