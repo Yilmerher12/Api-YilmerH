@@ -1,16 +1,8 @@
 # Importo herramientas de FastAPI
 from fastapi import APIRouter, Depends, HTTPException, status
-
-# Importo Session para trabajar con la base de datos
 from sqlalchemy.orm import Session
-
-# Importo la función que me da acceso a la base de datos
 from core.database import get_db
-
-# Importo el modelo de usuarios de la base de datos
 from core.models import UsuarioDB
-
-# Importo los esquemas de entrada y salida
 from schemas.usuario import UsuarioCrear, UsuarioSalida
 
 
