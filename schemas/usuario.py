@@ -1,47 +1,37 @@
+# Importo BaseModel y Field desde Pydantic
+from pydantic import BaseModel, Field
+from pydantic import EmailStr
 
-# Importo las herramientas que necesito de Pydantic
-from pydantic import BaseModel, EmailStr, Field
+# Creo el modelo base para los usuarios
+class UsuarioBase(BaseModel):
+    # Defino el username del usuario con mínimo y máximo de caracteres
+    username: str = Field(min_length=2, max_length=100)
+    # Defino el correo electrónico usando EmailStr para validación robusta
+    email: EmailStr
+    # Defino la contraseña con mínimo de caracteres
+    password: str = Field(min_length=6, example="Contraseña123")
+    
+# Creo el modelo para registrar usuarios
+class UsuarioCrear(UsuarioBase):
+    # Uso los mismos campos del modelo base
+    pass
 
-# Importo datetime para manejar fechas
-from datetime import datetime
 
-# Importo Optional por si después necesito campos opcionales
+# Modelo para actualizaciones parciales de usuario
 from typing import Optional
 
 
-# Creo el modelo base que tendrá la información principal del usuario
-class UsuarioBase(BaseModel):
+class UsuarioUpdate(BaseModel):
+    username: Optional[str] = Field(None, min_length=2, max_length=100)
+    email: Optional[EmailStr] = None
+    password: Optional[str] = Field(None, min_length=6)
 
-    # Guardo el correo y valido que tenga formato de email
-    email: EmailStr
-
-    # Defino el username con un mínimo y máximo de caracteres
-    username: str = Field(min_length=5, max_length=15)
-
-    # Asigno un rol por defecto
-    role: str = "aprendiz"
-
-
-# Creo el modelo para registrar usuarios
-class UsuarioCrear(UsuarioBase):
-
-    # Defino la contraseña con mínimo 10 caracteres
-    password: str = Field(
-        min_length=10,
-        json_schema_extra={"example": "Segura123456"}
-    )
-
-
-# Creo el modelo que usaré para mostrar datos del usuario
+# Creo el modelo para mostrar usuarios
 class UsuarioSalida(UsuarioBase):
-
     # Agrego el id del usuario
     id: int
 
-    # Agrego la fecha de creación
-    created_at: datetime
-
-
-    # Configuro el modelo para que pueda leer datos desde objetos
+    # Permito leer datos desde objetos
     class Config:
-        from_attributes = True
+        from_attributes = True  
+

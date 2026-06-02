@@ -1,101 +1,52 @@
-# Importo herramientas de FastAPI
-from fastapi import APIRouter, Depends, HTTPException, status
+from typing import List
+
+from fastapi import APIRouter, status, HTTPException, Depends
 from sqlalchemy.orm import Session
+
 from core.database import get_db
-from core.models import UsuarioDB
-from schemas.usuario import UsuarioCrear, UsuarioSalida
+from models import users_db
+from schemas.usuario import UsuarioCrear, UsuarioUpdate, UsuarioSalida
+from service.users import UserService
 
-
-# Creo el router para las rutas de usuarios
 router = APIRouter()
 
 
-# Creo una ruta POST para registrar usuarios
-@router.post(
-    "/crear",
-    response_model=UsuarioSalida,
-    status_code=status.HTTP_201_CREATED
-)
-async def crear_usuario(
-    usuario: UsuarioCrear,
-    db: Session = Depends(get_db)
-):
-
-    # Busco si ya existe un usuario con el mismo correo
-    registro_existente = (
-        db.query(UsuarioDB)
-        .filter(UsuarioDB.email == usuario.email)
-        .first()
-    )
+@router.get("/", response_model=List[UsuarioSalida])
+def obtener_usuarios(db: Session = Depends(get_db)):
+    service = UserService(db)
+    return service.get_all()
 
 
-    # Verifico si el correo ya está registrado
-    if registro_existente:
-
-        # Envío un error si el correo ya existe
-        raise HTTPException(
-            status_code=400,
-            detail="El correo ya esta registrado"
-        )
-
-
-    # Creo un nuevo usuario con los datos recibidos
-    nuevo_registro = UsuarioDB(
-        email=usuario.email,
-        username=usuario.username,
-        role=usuario.role,
-        password=usuario.password
-    )
+@router.get("/{id}", response_model=UsuarioSalida)
+def obtener_usuario(id: int, db: Session = Depends(get_db)):
+    service = UserService(db)
+    usuario = service.get_by_id(id)
+    if not usuario:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Usuario no encontrado")
+    return usuario
 
 
-    # Agrego el nuevo usuario a la sesión
-    db.add(nuevo_registro)
-
-    # Guardo los cambios en la base de datos
-    db.commit()
-
-    # Actualizo los datos del nuevo usuario
-    db.refresh(nuevo_registro)
+@router.post("/", response_model=UsuarioSalida, status_code=status.HTTP_201_CREATED)
+def crear_usuario(nuevo: UsuarioCrear, db: Session = Depends(get_db)):
+    service = UserService(db)
+    usuario = service.create(nuevo)
+    return usuario
 
 
-    # Retorno el usuario creado
-    return nuevo_registro
+@router.put("/{id}", response_model=UsuarioSalida)
+def actualizar_usuario(id: int, datos: UsuarioUpdate, db: Session = Depends(get_db)):
+    service = UserService(db)
+    usuario = service.update(id, datos)
+    if not usuario:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Usuario no encontrado")
+    return usuario
 
 
-# Creo una ruta DELETE para desactivar usuarios
-@router.delete("/eliminar/{usuario_id}")
-async def eliminar_usuario(
-    usuario_id: int,
-    db: Session = Depends(get_db)
-):
+@router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
+def eliminar_usuario(id: int, db: Session = Depends(get_db)):
+    service = UserService(db)
+    exito = service.delete(id)
+    if not exito:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Usuario no encontrado")
+    return
 
-    # Busco el usuario por su id
-    registro_a_eliminar = (
-        db.query(UsuarioDB)
-        .filter(UsuarioDB.id == usuario_id)
-        .first()
-    )
-
-
-    # Verifico si el usuario existe
-    if registro_a_eliminar is None:
-
-        # Envío un error si el usuario no existe
-        raise HTTPException(
-            status_code=404,
-            detail="El registro solicitado no existe"
-        )
-
-
-    # Cambio el estado del usuario a inactivo
-    registro_a_eliminar.activo = False
-
-
-    # Guardo los cambios
-    db.commit()
-
-
-    # Retorno un mensaje de confirmación
-    return {
-        "mensaje": "El usuario ha sido desactivado permanentemente (Borrado lógico)"
-    }
